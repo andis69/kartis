@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1920, user-scalable=no">
+  <title>Pokers</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="appbar">
+    <div class="tabs">
+      <button id="btab1" class="tabbtn focusable on">Parametri</button>
+      <button id="btab2" class="tabbtn focusable">Sp&#275;le</button>
+      <button id="btab3" class="tabbtn focusable">Radio</button>
+    </div>
+    <div id="clock" class="clock">--:--</div>
+  </div>
+
+  <!-- Tab 1: Parametri -->
+  <section id="tab1" class="panel active">
+    <div class="form">
+      <button id="newGame" class="bigbtn focusable">Jauna sp&#275;le</button>
+
+      <div class="frow">
+        <span class="flabel">Sp&#275;l&#275;t&#257;ji</span>
+        <div id="f_count" class="stepper focusable">
+          <span class="step-arrow">&#8249;</span>
+          <span id="countVal" class="step-val">4</span>
+          <span class="step-arrow">&#8250;</span>
+        </div>
+      </div>
+
+      <div class="names">
+        <div id="nrow1" class="nrow focusable"><span class="num">1</span><input id="name1" class="nameinput" type="text" autocomplete="off"><span class="movebtns"><button class="mv" data-idx="1" data-dir="-1">&#9650;</button><button class="mv" data-idx="1" data-dir="1">&#9660;</button></span></div>
+        <div id="nrow2" class="nrow focusable"><span class="num">2</span><input id="name2" class="nameinput" type="text" autocomplete="off"><span class="movebtns"><button class="mv" data-idx="2" data-dir="-1">&#9650;</button><button class="mv" data-idx="2" data-dir="1">&#9660;</button></span></div>
+        <div id="nrow3" class="nrow focusable"><span class="num">3</span><input id="name3" class="nameinput" type="text" autocomplete="off"><span class="movebtns"><button class="mv" data-idx="3" data-dir="-1">&#9650;</button><button class="mv" data-idx="3" data-dir="1">&#9660;</button></span></div>
+        <div id="nrow4" class="nrow focusable"><span class="num">4</span><input id="name4" class="nameinput" type="text" autocomplete="off"><span class="movebtns"><button class="mv" data-idx="4" data-dir="-1">&#9650;</button><button class="mv" data-idx="4" data-dir="1">&#9660;</button></span></div>
+        <div id="nrow5" class="nrow focusable"><span class="num">5</span><input id="name5" class="nameinput" type="text" autocomplete="off"><span class="movebtns"><button class="mv" data-idx="5" data-dir="-1">&#9650;</button><button class="mv" data-idx="5" data-dir="1">&#9660;</button></span></div>
+      </div>
+
+      <div id="f_scale" class="frow focusable">
+        <span class="flabel">Izm&#275;rs</span>
+        <input id="scale" type="range" min="0.75" max="2" step="0.05" value="1.5" tabindex="-1">
+        <span id="scaleVal" class="scaleval">150 %</span>
+      </div>
+
+      <div class="frow">
+        <span class="flabel">Dizains</span>
+        <div id="f_theme" class="stepper focusable"><span id="themeVal" class="step-val">Gai&#353;s</span></div>
+      </div>
+
+      <div class="frow">
+        <span class="flabel">Stiķi</span>
+        <div id="f_won" class="stepper focusable"><span id="wonVal" class="step-val">P&#257;rbaud&#299;t</span></div>
+      </div>
+    </div>
+
+      <hr class="hint-sep">
+      <div class="hint-title">Padoms</div>
+      <p class="hint">
+        Tālvad&#299;ba: bultiņas p&#257;rvieto, <b>OK</b> izv&#275;las / apstiprina, <b>Atpakaļ</b> iziet.
+        Sp&#275;l&#275;t&#257;ja rind&#257; <b>&#9664;/&#9654;</b> maina vietām (&#9650;&#9660;), <b>OK</b> labo v&#257;rdu.
+        Spēl&#275; aizej uz &scaron;&#363;nu un spied ciparu — uzreiz lec uz n&#257;kamo. Divciparu skaitlim atgriezies un pievieno otru ciparu; <b>&#9003;</b> dz&#275;š. Paneļa <b>OK</b> (blakus 9) p&#257;rlec uz aktīvo &scaron;&#363;nu.
+        Ja pultij ir ciparu taustiņi — spied tos tie&scaron;i (uzreiz lec uz n&#257;kamo).
+        St&#299;ķi: <b>Autom&#257;tiski</b> aizpilda pēdējo Dab&#363;; <b>P&#257;rbaud&#299;t</b> — ievadi visus, r&#257;da atlikušos un iez&#299;m&#275; rindu, ja summa nesakr&#299;t.
+      </p>
+  </section>
+
+  <!-- Tab 2: Spele -->
+  <section id="tab2" class="panel">
+    <div class="topbar">
+      <span id="txt1" class="t1"></span>
+      <span id="txt2" class="t2"></span>
+    </div>
+
+    <div id="gridHeadWrap" class="gridheadwrap">
+      <table id="gridHead" class="grid"></table>
+    </div>
+    <div id="gridWrap" class="gridwrap">
+      <table id="gridTable" class="grid"></table>
+    </div>
+
+    <div id="pad" class="pad">
+      <button class="focusable padkey" data-act="del">&#9003;</button>
+      <button class="focusable padkey" data-d="0">0</button>
+      <button class="focusable padkey" data-d="1">1</button>
+      <button class="focusable padkey" data-d="2">2</button>
+      <button class="focusable padkey" data-d="3">3</button>
+      <button class="focusable padkey" data-d="4">4</button>
+      <button class="focusable padkey" data-d="5">5</button>
+      <button class="focusable padkey" data-d="6">6</button>
+      <button class="focusable padkey" data-d="7">7</button>
+      <button class="focusable padkey" data-d="8">8</button>
+      <button class="focusable padkey" data-d="9">9</button>
+      <button class="focusable padkey ok" data-act="ok">OK</button>
+    </div>
+  </section>
+
+  <!-- Tab 3: Papildu (dizains + radio) -->
+  <section id="tab3" class="panel">
+    <div class="form">
+      <div class="frow">
+        <span class="flabel">Stacija</span>
+        <div id="f_station" class="stepper focusable">
+          <span class="step-arrow">&#8249;</span>
+          <span id="stationVal" class="step-val station">&#8212;</span>
+          <span class="step-arrow">&#8250;</span>
+        </div>
+      </div>
+      <div class="frow">
+        <span class="flabel">Atska&#326;o&#353;ana</span>
+        <div id="f_play" class="stepper focusable"><span id="playVal" class="step-val">&#9654; Atska&#326;ot</span></div>
+      </div>
+      <div class="frow">
+        <span class="flabel">Ska&#316;ums</span>
+        <div id="f_volume" class="stepper focusable">
+          <span class="step-arrow">&#8249;</span>
+          <span id="volVal" class="step-val">60 %</span>
+          <span class="step-arrow">&#8250;</span>
+        </div>
+      </div>
+      <p id="radioStatus" class="hint"></p>
+    </div>
+      <hr class="hint-sep">
+      <div class="hint-title">Padoms</div>
+      <p class="hint">Straumes var main&#299;t faila <b>js/main.js</b> s&#257;kum&#257; (saraksts RADIO). Vajadz&#299;ga interneta piekļuve (jau iesl&#275;gta config.xml).</p>
+    <audio id="radio" preload="none"></audio>
+  </section>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
