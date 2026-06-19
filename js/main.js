@@ -397,6 +397,13 @@
     if (fn) { try { var pr = fn.call(el); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {} }
   }
   function onFsChange() { if (!(document.fullscreenElement || document.webkitFullscreenElement)) fsArmed = true; }
+  // Channel Up/Down -> page-scroll the score table (or the active menu panel).
+  function pageScroll(dir) {
+    var el = activeTab === 2 ? document.getElementById('gridWrap') : document.getElementById('tab' + activeTab);
+    if (!el) return;
+    var amt = Math.max(120, Math.round(el.clientHeight * 0.85));
+    el.scrollTop += dir * amt;
+  }
 
   function changeCount(delta) {
     var ni = state.comboIndex + delta; if (ni < 0) ni = 0; if (ni > 3) ni = 3;
@@ -521,10 +528,14 @@
     var a = document.activeElement;
     return a && a.classList && a.classList.contains('nameinput');
   }
+  var exitArmed = false; // double-Back to exit: a Back press first goes to Parametri; only a second consecutive Back exits
   function goBack() {
     if (buffer !== null) { buffer = null; render(); return; }
     if (isEditingName()) { document.activeElement.blur(); return; }
-    if (activeTab === 2 || activeTab === 3) { showTab(1); focus = { zone: 'form', i: 0 }; applyFocus(); return; }
+    if (activeTab === 2 || activeTab === 3) {
+      showTab(1); focus = { zone: 'form', i: 0 }; applyFocus(); exitArmed = true; return; // -> Parametri; next Back exits
+    }
+    if (!exitArmed) { exitArmed = true; focus = { zone: 'form', i: 0 }; applyFocus(); return; } // first Back on Parametri: stay
     try { if (window.tizen && tizen.application) { tizen.application.getCurrentApplication().exit(); return; } } catch (e) {}
   }
 
@@ -592,8 +603,17 @@
   function registerTVKeys() {
     try {
       if (window.tizen && tizen.tvinputdevice && tizen.tvinputdevice.registerKey) {
-        var keys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        var keys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'ChannelUp', 'ChannelDown',
+          'MediaPlayPause', 'MediaPlay', 'MediaPause', 'MediaStop', 'MediaTrackNext', 'MediaTrackPrevious',
+          'MediaFastForward', 'MediaRewind'];
         for (var i = 0; i < keys.length; i++) { try { tizen.tvinputdevice.registerKey(keys[i]); } catch (e) {} }
+        // Also register the "−/−−" / DEL button so it reaches the app (match its delete code).
+        if (tizen.tvinputdevice.getSupportedKeys) {
+          var sup = tizen.tvinputdevice.getSupportedKeys() || [], want = { 46: 1, 109: 1, 173: 1, 189: 1 };
+          for (var j = 0; j < sup.length; j++) {
+            if (sup[j] && want[sup[j].code]) { try { tizen.tvinputdevice.registerKey(sup[j].name); } catch (e) {} }
+          }
+        }
       }
     } catch (e) {}
   }
@@ -681,6 +701,7 @@
     window.addEventListener('keydown', function (e) {
       requestFullscreenOnce();
       var kc = e.keyCode;
+      if (kc !== 10009) exitArmed = false; // any non-Back key cancels the "press Back again to exit" state
       if (isEditingName()) {
         if (kc === 13 || kc === 10009) { document.activeElement.blur(); stop(e); }
         return;
@@ -698,6 +719,18 @@
         case 8: if (activeTab === 2 && (focus.zone === 'grid' || focus.zone === 'pad')) { backspaceCell(); stop(e); } break;
         case 27: if (buffer !== null) { buffer = null; render(); stop(e); } break;
         case 10009: goBack(); stop(e); break;
+        case 427: pageScroll(-1); stop(e); break; // Channel Up   -> scroll table up
+        case 428: pageScroll(1); stop(e); break;  // Channel Down -> scroll table down
+        case 46: case 109: case 173: case 189:    // Delete / "−/−−" remote button -> backspace (like on-screen ⌫)
+          if (activeTab === 2 && (focus.zone === 'grid' || focus.zone === 'pad')) { backspaceCell(); stop(e); }
+          break;
+        case 415: playRadio(); stop(e); break;           // Media Play       -> play radio (from any tab)
+        case 19: case 413: stopRadio(); stop(e); break;  // Media Pause/Stop -> stop radio
+        case 10252: toggleRadio(); stop(e); break;       // Media Play/Pause -> toggle
+        case 10233: changeStation(1); stop(e); break;    // Media Next  -> next station
+        case 10232: changeStation(-1); stop(e); break;   // Media Prev  -> previous station
+        case 417: changeVolume(1); stop(e); break;       // Media Fast-forward (seek) -> volume up
+        case 412: changeVolume(-1); stop(e); break;      // Media Rewind (seek)       -> volume down
       }
     }, true);
 
